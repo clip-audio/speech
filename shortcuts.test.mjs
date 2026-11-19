@@ -1,0 +1,6 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {shortcutAction,moveHighlight} from './shortcuts.mjs';
+test('enter routes to chat and shift enter to preview from search',()=>{assert.deepEqual(shortcutAction({key:'Enter'},{tagName:'INPUT',id:'search'}),{play:'chat'});assert.deepEqual(shortcutAction({key:'Enter',shiftKey:true},{tagName:'BODY'}),{play:'preview'});});
+test('editing, controls, composition, modifiers and repeated Enter retain native behavior',()=>{for(const target of [{tagName:'INPUT',id:'apiKey'},{tagName:'INPUT',type:'number'},{tagName:'BUTTON'},{tagName:'SELECT'},{tagName:'TEXTAREA'},{isContentEditable:true}])assert.equal(shortcutAction({key:'Enter'},target),null);for(const extra of [{ctrlKey:true},{metaKey:true},{altKey:true},{isComposing:true},{repeat:true}])assert.equal(shortcutAction({key:'Enter',...extra}),null);});
+test('arrow navigation clamps to bounds and handles empty or stale selection',()=>{assert.deepEqual(shortcutAction({key:'ArrowDown'}),{move:1});assert.equal(moveHighlight(['a','b'],'a',1),'b');assert.equal(moveHighlight(['a','b'],'a',-1),'a');assert.equal(moveHighlight(['a','b'],'b',1),'b');assert.equal(moveHighlight(['a','b'],'missing',1),'a');assert.equal(moveHighlight([],null,1),null);});
